@@ -34,6 +34,7 @@ s1=pd.Series(d, index=['a','b','c','d'])
 print(s1)
 
 
+
 #순회 (index, values라는 속성을 통해 접근이 가능하다.)
 for date in s.index:
     print(date, end=' ') #출력하고 스페이스 반복
@@ -66,3 +67,4 @@ print(s3, type(s3))
 
 s3=s1*3
 print(s3, type(s3))
+

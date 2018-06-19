@@ -6,7 +6,7 @@ CONFIG={
     'common': {
         'start_year':2017,
         'end_year':2017,
-        'fetch':True,
+        'fetch':False, #데이터를 받아와서 False상태
         'result_directory': '__results__/crawling',
         'service_key': 'CltvcqjQZrEAZ%2BALT9RK1rIrikygd%2BKeHKuFqjc0N7Nf9EPcCxm3JvkMrD8AepS5BdKB6wc6prRZVSvU9DGmTg%3D%3D'
     }

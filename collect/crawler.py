@@ -113,7 +113,7 @@ def crawling_tourspot_visitor( #config파라미터 받음
 
 def crawling_foreign_visitor(country, start_year, end_year, fetch=True, result_directory='',service_key=''):
     results = []
-
+    filename = '%s/%s(%s)_foreignvisitor_%s_%s.json' % (result_directory, country[0], country[1], start_year, end_year) #fetch가 false이든 아니든 이름은 생성되게
     if fetch: #매개변수인 fetch를 사용하게 만듬,
         for year in range(start_year, end_year+1):
             for month in range(1, 13):
@@ -125,9 +125,10 @@ def crawling_foreign_visitor(country, start_year, end_year, fetch=True, result_d
                 results.append(data)
 
         # save data to file
-        filename = '%s/%s(%s)_foreignvisitor_%s_%s.json' % (result_directory, country[0], country[1], start_year, end_year)
+
         with open(filename, 'w', encoding='utf-8') as outfile:
             json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False)
             outfile.write(json_string)
 
+    return filename
 
