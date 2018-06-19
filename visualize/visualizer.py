@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import math
 
 
 def graph_scatter(result_analysis):
@@ -18,3 +19,4 @@ def graph_scatter(result_analysis):
         )
     plt.subplots_adjust(wspace=0)
     plt.show()
+

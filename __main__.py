@@ -23,14 +23,15 @@ if __name__ == '__main__':
             resultfiles['foreign_visitor'].append(rf)#rf를 resultfile에 추가
 
     # 1.analysis and visulize
-    result_analysis=analyze.analysis_correlation(resultfiles)
+    #result_analysis=analyze.analysis_correlation(resultfiles)
+   # print(result_analysis)
     #print(result_analysis)
 
     #visualize
-    visualize.graph_scatter(result_analysis)
+    #visualize.graph_scatter(result_analysis)
 
     #2.analysis and visualize, 장소별로 상관계수 구하끠
-    #result_analysis = analyze.analysis_correlation_by_tourspot(resultfiles)
+    result_analysis = analyze.analysis_correlation_by_tourspot(resultfiles)
     #graph_table = pd.DataFrame(result_analysis, columns=['tourspot','r_중국','r_일본','r_미국'])
     #graph_table = graph_table.set_index('tourspot')
 
