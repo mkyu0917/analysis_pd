@@ -1,6 +1,7 @@
 import collect
 import collect
 import analyze
+import visualize
 from config import CONFIG
 
 
@@ -17,11 +18,24 @@ if __name__ == '__main__':
         #end_year= CONFIG['common']['end_year'])
 
     resultfiles['foreign_visitor']=[]
-    for country in CONFIG['conutries']:
+    for country in CONFIG['countries']:
             rf=collect.crawling_foreign_visitor(country, **CONFIG['common'] )#rf로 받음
             resultfiles['foreign_visitor'].append(rf)#rf를 resultfile에 추가
-    #analysis
-    analyze.analysis_correlation(resultfiles) #
 
+    # 1.analysis and visulize
+    result_analysis=analyze.analysis_correlation(resultfiles)
+    #print(result_analysis)
 
     #visualize
+    visualize.graph_scatter(result_analysis)
+
+    #2.analysis and visualize, 장소별로 상관계수 구하끠
+    #result_analysis = analyze.analysis_correlation_by_tourspot(resultfiles)
+    #graph_table = pd.DataFrame(result_analysis, columns=['tourspot','r_중국','r_일본','r_미국'])
+    #graph_table = graph_table.set_index('tourspot')
+
+    #graph_table.plot(kind='bar')
+    #plt.show()
+    #tourspot r_중국 r_일본 r_미국 중국_입국자수
+    #경복궁     0.2    0.3    0.5
+    #이런 값들을 넘겨줌니다.
