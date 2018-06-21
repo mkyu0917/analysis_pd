@@ -8,7 +8,7 @@ import math
 def analysis_correlation(resultfiles):
     with open(resultfiles['tourspot_visitor'],'r',encoding='utf-8') as initfile: #데이터열어서 확인
         json_data =json.loads(initfile.read())
-        print(json_data)
+        #print(json_data)
 
     tourspotvisitor_table  = pd.DataFrame(json_data, columns=['count_foreigner','date','tourist_spot']) # DataFrame=table 을 생성하고 컬럼을 설정하고 값을 도출
     temp_tourspotvisitor_table= pd.DataFrame(tourspotvisitor_table.groupby('date')['count_foreigner'].sum()) #날짜에 대한 외국인들 합산값 데이트별로 도출
@@ -18,10 +18,12 @@ def analysis_correlation(resultfiles):
     for filename in resultfiles['foreign_visitor']:
         with open(filename, 'r', encoding='utf-8') as infile:
             json_data = json.loads(infile.read())
-            print(json_data)
+            #print(json_data)
         foreignvisitor_table = pd.DataFrame(json_data, columns=['country_name', 'date', 'visit_count'])
-        print(foreignvisitor_table)
+
+        #print(foreignvisitor_table)
         foreignvisitor_table = foreignvisitor_table.set_index('date')
+        print(foreignvisitor_table)
         # merge_table = pd.merge(
         #     temp_tourspotvisitor_table,
         #     foreignvisitor_table,
@@ -46,43 +48,69 @@ def analysis_correlation_by_tourspot(resultfiles):
         print(json_data)
 
         tourspot_table = pd.DataFrame(json_data, columns=['tourist_spot', 'count_foreigner','date'])  # DataFrame=table 을 생성하고 컬럼을 설정하고 값을 도출
-        temp_table = tourspot_table[tourspot_table['tourist_spot'] == '경복궁']  # 경복궁 값만 빼오기
-        tourist_spot = tourspot_table['tourist_spot'].unique() #모든 놀러가는 스팟
-        print(tourist_spot)
+        #print(tourist_spot)
 
-        results = []
+        foreignvisitors = []
         for filename in resultfiles['foreign_visitor']:
             with open(filename, 'r', encoding='utf-8') as infile:
                 json_data = json.loads(infile.read())
-                print(json_data)
+                #print(json_data)
             foreignvisitor_table = pd.DataFrame(json_data, columns=['country_name', 'date', 'visit_count'])
-            print(foreignvisitor_table)
+            foreignvisitor_table = pd.DataFrame(foreignvisitor_table.set_index('date'))
+            tourist_spot = tourspot_table['tourist_spot'].unique()  # 모든 놀러가는 스팟
+            temp_table = tourspot_table[tourspot_table['tourist_spot'] == '경복궁']  # 경복궁 값만 빼오기
+
+            for spot in tourist_spot:
+                tourist_spot = tourspot_table[tourspot_table['tourist_spot'] == spot]  # 경복궁 값만 빼오기
+                tourist_spot = pd.DataFrame(tourist_spot.set_index('date'))
+
+
+                for merge in foreignvisitor_table: #merge foreigner and spot
+                    merge_table=pd.merge(
+                        tourist_spot,foreignvisitor_table,right_index=True,left_index=True
+                    )
+                print(merge_table)
+                for data in merge_table: # 데이터뽑아서 상관계수 함수에 전달
+
+                    x = list(merge_table['visit_count'])
+                    y = list(merge_table['count_foreigner'])
+                    correlation_coefficient(x,y)
+                    print(x,y)
+
+def correlation_coefficient(x, y):
+    n = len(x)
+    vals = range(n)
+
+    x_sum = sum(x)
+    y_sum = sum(y)
+    x_sum_pow = pow(x_sum,2)
+    print(x_sum_pow)
+    y_sum_pow = pow(y_sum,2)
+    print(x_sum_pow)
+    mul_xy_sum = x
+    print(mul_xy_sum)
+
+    for i in vals:
+        mul_xy_sum = mul_xy_sum + float(x[i]) * float(y[i])
+        x_sum = x_sum + float(x[i])
+        y_sum = y_sum + float(y[i])
+        x_sum_pow = x_sum_pow + pow(float(x[i]), 2)
+        y_sum_pow = y_sum_pow + pow(float(y[i]), 2)
+
+        try:
+            r = ((n * mul_xy_sum) - (x_sum * y_sum)) / \
+            math.sqrt(((n * x_sum_pow) - pow(x_sum, 2)) * ((n * y_sum_pow) - pow(y_sum, 2)))
+        except Exception as e:
+            r = 0.0
+
+    return r
 
 
 
-   #경복궁빼내기
-#----------------
-
-
-         #중복되는 리스트 제거
-        tourist_spot = tourspot_table['tourist_spot'].unique()
-        print(tourist_spot)
-
-        temp_table = tourspot_table[tourspot_table['tourist_spot'] == '경복궁']  # 경복궁 값만 빼오기
-        print(temp_table)
-
-        for spot in len(tourist_spot):
-           spot['tourist_spot']
-           print(tourist_spot)
-
-#-----------------
-
-
-
-        merge_table = pd.merge(
-             temp_table,
-             foreignvisitor_table,
-             )
-        print(merge_table)
-        merge_table=pd.DataFrame(merge_table,columns=['date','count_foreigner','visit_count'])
-        print(merge_table)
+        # merge_table = pd.merge(
+        #      temp_table,
+        #      foreignvisitor_table,
+        #      )
+        # print(merge_table)
+        # merge_table=pd.DataFrame(merge_table,columns=['date','count_foreigner','visit_count'])
+        # print(merge_table)
