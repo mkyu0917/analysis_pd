@@ -14,7 +14,7 @@ def analysis_correlation(resultfiles):
     temp_tourspotvisitor_table= pd.DataFrame(tourspotvisitor_table.groupby('date')['count_foreigner'].sum()) #날짜에 대한 외국인들 합산값 데이트별로 도출
 
     results=[]
-    results = []
+    # results = []
     for filename in resultfiles['foreign_visitor']:
         with open(filename, 'r', encoding='utf-8') as infile:
             json_data = json.loads(infile.read())
@@ -45,50 +45,48 @@ def analysis_correlation(resultfiles):
 def analysis_correlation_by_tourspot(resultfiles):
     with open(resultfiles['tourspot_visitor'], 'r', encoding='utf-8') as initfile:  # 데이터열어서 확인
         json_data = json.loads(initfile.read())
-        print(json_data)
 
         tourspot_table = pd.DataFrame(json_data, columns=['tourist_spot', 'count_foreigner','date'])  # DataFrame=table 을 생성하고 컬럼을 설정하고 값을 도출
         #print(tourist_spot)
+        tourist_spot = tourspot_table['tourist_spot'].unique()
 
-        foreignvisitors = []
-        for filename in resultfiles['foreign_visitor']:
-            with open(filename, 'r', encoding='utf-8') as infile:
-                json_data = json.loads(infile.read())
-                #print(json_data)
-            foreignvisitor_table = pd.DataFrame(json_data, columns=['country_name', 'date', 'visit_count'])
-            foreignvisitor_table = pd.DataFrame(foreignvisitor_table.set_index('date'))
-            tourist_spot = tourspot_table['tourist_spot'].unique()  # 모든 놀러가는 스팟
-            temp_table = tourspot_table[tourspot_table['tourist_spot'] == '경복궁']  # 경복궁 값만 빼오기
+        results=[]
+        for spot in tourist_spot:
+            tourist_spot = tourspot_table[tourspot_table['tourist_spot'] == spot]  # 경복궁 값만 빼오기
+            tourist_spot = pd.DataFrame(tourist_spot.set_index('date'))
 
-            for spot in tourist_spot:
-                tourist_spot = tourspot_table[tourspot_table['tourist_spot'] == spot]  # 경복궁 값만 빼오기
-                tourist_spot = pd.DataFrame(tourist_spot.set_index('date'))
+            z = []
+            for filename in resultfiles['foreign_visitor']:
+                with open(filename, 'r', encoding='utf-8') as infile:
+                    json_data = json.loads(infile.read())
+                    #print(json_data)
+                foreignvisitor_table = pd.DataFrame(json_data, columns=['country_name', 'date', 'visit_count'])
+                foreignvisitor_table = pd.DataFrame(foreignvisitor_table.set_index('date'))
+                temp_table = tourspot_table[tourspot_table['tourist_spot'] == '경복궁']  # 경복궁 값만 빼오기
 
-
-                for merge in foreignvisitor_table: #merge foreigner and spot
-                    merge_table=pd.merge(
+                merge_table=pd.merge(
                         tourist_spot,foreignvisitor_table,right_index=True,left_index=True
                     )
-                print(merge_table)
-                for data in merge_table: # 데이터뽑아서 상관계수 함수에 전달
 
-                    x = list(merge_table['visit_count'])
-                    y = list(merge_table['count_foreigner'])
-                    correlation_coefficient(x,y)
-                    print(x,y)
+
+                x = list(merge_table['visit_count'])
+                y = list(merge_table['count_foreigner'])
+
+                a = tourist_spot['tourist_spot'].unique().item(0)
+                r = correlation_coefficient(x, y)
+                z.append(r)
+                results.append({'tourspot': a, 'r_중국':z[0], 'r_일본':z[0], 'r_미국':z[0]})
+    print(results)
 
 def correlation_coefficient(x, y):
     n = len(x)
     vals = range(n)
 
-    x_sum = sum(x)
-    y_sum = sum(y)
-    x_sum_pow = pow(x_sum,2)
-    print(x_sum_pow)
-    y_sum_pow = pow(y_sum,2)
-    print(x_sum_pow)
-    mul_xy_sum = x
-    print(mul_xy_sum)
+    x_sum = 0.0
+    y_sum = 0.0
+    x_sum_pow = 0.0
+    y_sum_pow = 0.0
+    mul_xy_sum = 0.0
 
     for i in vals:
         mul_xy_sum = mul_xy_sum + float(x[i]) * float(y[i])
@@ -97,15 +95,13 @@ def correlation_coefficient(x, y):
         x_sum_pow = x_sum_pow + pow(float(x[i]), 2)
         y_sum_pow = y_sum_pow + pow(float(y[i]), 2)
 
-        try:
-            r = ((n * mul_xy_sum) - (x_sum * y_sum)) / \
+    try:
+        r = ((n * mul_xy_sum) - (x_sum * y_sum)) / \
             math.sqrt(((n * x_sum_pow) - pow(x_sum, 2)) * ((n * y_sum_pow) - pow(y_sum, 2)))
-        except Exception as e:
-            r = 0.0
+    except Exception as e:
+        r = 0.0
 
     return r
-
-
 
         # merge_table = pd.merge(
         #      temp_table,
