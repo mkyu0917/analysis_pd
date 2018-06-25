@@ -50,7 +50,7 @@ def analysis_correlation_by_tourspot(resultfiles):
         #print(tourist_spot)
         tourist_spot = tourspot_table['tourist_spot'].unique()
 
-        results=[]
+        result_analysis=[]
         for spot in tourist_spot:
             tourist_spot = tourspot_table[tourspot_table['tourist_spot'] == spot]  # 경복궁 값만 빼오기
             tourist_spot = pd.DataFrame(tourist_spot.set_index('date'))
@@ -75,8 +75,13 @@ def analysis_correlation_by_tourspot(resultfiles):
                 a = tourist_spot['tourist_spot'].unique().item(0)
                 r = correlation_coefficient(x, y)
                 z.append(r)
-                results.append({'tourspot': a, 'r_중국':z[0], 'r_일본':z[0], 'r_미국':z[0]})
-    print(results)
+            result_analysis.append({'tourspot': a, 'r_중국':z[0], 'r_일본':z[1], 'r_미국':z[2]})
+    graph_table = pd.DataFrame(result_analysis, columns=['tourspot', 'r_중국', 'r_일본', 'r_미국'])
+    graph_table = graph_table.set_index('tourspot')
+    graph_table.plot(kind='bar')
+
+
+    plt.show()
 
 def correlation_coefficient(x, y):
     n = len(x)
